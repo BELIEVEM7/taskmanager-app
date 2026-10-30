@@ -1,3 +1,5 @@
+import TaskItem from "./TaskItem";
+
 export type Task = {
   id: number;
   title: string;
@@ -11,13 +13,9 @@ export default function TaskList({ tasks }: { tasks: Task[] }) {
   }
 
   return (
-    <ul className="space-y-2">
+    <ul className="list-none space-y-2 p-0">
       {tasks.map((task) => (
-        <li key={task.id} className="rounded-md border px-3 py-2">
-          <span className={task.completed ? "text-muted-foreground line-through" : ""}>
-            {task.title}
-          </span>
-        </li>
+        <TaskItem key={task.id} task={task} />
       ))}
     </ul>
   );
