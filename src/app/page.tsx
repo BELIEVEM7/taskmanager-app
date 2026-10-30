@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import LogoutButton from "@/components/LogoutButton";
 
 import TaskList from "@/components/TaskList";
+import AddTaskForm from "@/components/TaskForm";
 
 export default async function HomePage() {
   const session = await getSession();
@@ -30,6 +31,7 @@ export default async function HomePage() {
             <p className="mt-2 mb-6 text-muted-foreground">
         Hello, {user.name ?? user.email}
       </p>
+      <AddTaskForm/>
       <TaskList tasks={tasks} />
     </main>
   );
