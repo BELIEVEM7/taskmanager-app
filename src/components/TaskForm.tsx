@@ -20,7 +20,8 @@ export default function AddTaskForm() {
   const hasOptions =
     options.startDate !== "" ||
     options.startTime !== "" ||
-    options.priority !== "NONE";
+    options.priority !== "NONE" ||
+    options.description !== "";
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

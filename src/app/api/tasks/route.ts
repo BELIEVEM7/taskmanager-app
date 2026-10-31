@@ -26,7 +26,8 @@ export async function POST(request: Request){
 
     const body = await request.json().catch(() => null);
     const title = typeof body?.title === "string" ? body.title.trim() : "";
-    const description = typeof body?.description === "string" ? body.description.trim() : "";
+    const description =
+        typeof body?.description === "string" ? body.description.trim() || null : null;
 
     if(!title){
         return NextResponse.json({ error: "Title is required"}, {status: 400 });

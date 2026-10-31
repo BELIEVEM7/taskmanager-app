@@ -9,12 +9,14 @@ import { Input } from "@/components/ui/input";
 import TaskMeta from "./TaskMeta";
 import TaskOptionsFields, { type TaskOptions } from "./TaskOptionsFields";
 import type { Task } from "./TaskList";
+import { PRIORITY_STYLES } from "@/lib/priority";
 
 function optionsOf(task: Task): TaskOptions {
   return {
     startDate: task.startDate ?? "",
     startTime: task.startTime ?? "",
     priority: task.priority,
+    description: task.description ?? "",
   };
 }
 
@@ -61,7 +63,11 @@ export default function TaskItem({ task }: { task: Task }) {
   }
 
   return (
-    <li className="rounded-md border px-3 py-2">
+    <li
+      className={`rounded-md border px-3 py-2 ${PRIORITY_STYLES[task.priority].row} ${
+        task.completed ? "opacity-60" : ""
+      }`}
+    >
       {editing ? (
         <form onSubmit={save} className="space-y-3">
           <Input

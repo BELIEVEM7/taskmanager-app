@@ -5,6 +5,7 @@ import LogoutButton from "@/components/LogoutButton";
 
 import TaskList from "@/components/TaskList";
 import AddTaskForm from "@/components/TaskForm";
+import PriorityKey from "@/components/PriorityKey";
 
 export default async function HomePage() {
   const session = await getSession();
@@ -41,6 +42,7 @@ export default async function HomePage() {
       </p>
       <AddTaskForm/>
       <TaskList tasks={tasks} />
+      <PriorityKey />
     </main>
   );
 }
