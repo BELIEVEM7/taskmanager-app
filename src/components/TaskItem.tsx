@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import type { Task } from "./TaskList";
+import TaskMeta from "./TaskMeta";
 
 export default function TaskItem({ task }: { task: Task }) {
   const router = useRouter();
@@ -71,13 +72,14 @@ export default function TaskItem({ task }: { task: Task }) {
           </form>
         ) : (
           <>
-            <span
-              className={`flex-1 ${
-                task.completed ? "text-muted-foreground line-through" : ""
-              }`}
-            >
-              {task.title}
-            </span>
+            <div className="flex-1">
+              <span
+                className={task.completed ? "text-muted-foreground line-through" : ""}
+              >
+                {task.title}
+              </span>
+              <TaskMeta task={task} />
+            </div>
             <Button
               size="sm"
               variant="ghost"

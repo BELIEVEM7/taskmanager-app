@@ -19,7 +19,15 @@ export default async function HomePage() {
   const tasks = await prisma.task.findMany({
     where: { userId: session.userId },
     orderBy: { createdAt: "desc" },
-    select: { id: true, title: true, description: true, completed: true },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      completed: true,
+      startDate: true,
+      startTime: true,
+      priority: true,
+    },
   });
 
   return (
