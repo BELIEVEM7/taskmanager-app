@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 
+import { parseTaskOptions } from "@/lib/taskOptions";
+
 type Context = { params: Promise<{ id: string }> };
 
 export async function PATCH(request: Request, { params }: Context) {
@@ -42,9 +44,16 @@ export async function PATCH(request: Request, { params }: Context) {
     data.completed = body.completed;
   }
 
-  if (Object.keys(data).length === 0) {
+  const options = parseTaskOptions(body);
+  if ("error" in options) {
+    return NextResponse.json({ error: options.error }, { status: 400 });
+  }
+
+  if (Object.keys(data).length === 0 && Object.keys(options.data).length === 0) {
     return NextResponse.json({ error: "Nothing to update" }, { status: 400 });
   }
+
+
 
   // Only find the task if it belongs to this user
   const existing = await prisma.task.findFirst({
@@ -54,7 +63,7 @@ export async function PATCH(request: Request, { params }: Context) {
     return NextResponse.json({ error: "Task not found" }, { status: 404 });
   }
 
-  const task = await prisma.task.update({ where: { id }, data });
+  const task = await prisma.task.update({ where: { id }, data: { ...data, ...options.data } });
   return NextResponse.json({ task });
 }
 

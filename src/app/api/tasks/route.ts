@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSession } from "@/lib/auth";
 
+import { parseTaskOptions } from "@/lib/taskOptions";
+
 export async function GET(){
     const session = await getSession();
     if(!session){
@@ -33,8 +35,13 @@ export async function POST(request: Request){
         return NextResponse.json({ error: "Title must be 200 characters or fewer"}, {status: 400 });
     }
 
+    const options = parseTaskOptions(body ?? {});
+    if ("error" in options) {
+        return NextResponse.json({ error: options.error }, { status: 400 });
+    }
+
     const task = await prisma.task.create({
-        data: {title, description, userId: session.userId },
+        data: {title, description, userId: session.userId, ...options.data}, 
     })
 
     return NextResponse.json({ task }, { status: 201 });

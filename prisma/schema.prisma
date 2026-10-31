@@ -24,6 +24,13 @@ model User{
   
 }
 
+enum Priority {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+}
+
 model Task{
   id          Int      @id @default(autoincrement())
   title       String
@@ -31,6 +38,9 @@ model Task{
   completed   Boolean  @default(false)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  startDate   String?
+  startTime   String?
+  priority    Priority @default(NONE)
   userId      Int      
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
