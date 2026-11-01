@@ -42,6 +42,7 @@ export default function AddTaskForm() {
       <div className="flex gap-2">
         <Input
           placeholder="What needs doing?"
+          maxLength={200} 
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />

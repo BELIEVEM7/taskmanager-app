@@ -36,6 +36,13 @@ export async function POST(request: Request){
         return NextResponse.json({ error: "Title must be 200 characters or fewer"}, {status: 400 });
     }
 
+    if (description && description.length > 500) {
+        return NextResponse.json(
+            { error: "Description must be 500 characters or fewer" },
+            { status: 400 }
+        );
+    }
+
     const options = parseTaskOptions(body ?? {});
     if ("error" in options) {
         return NextResponse.json({ error: options.error }, { status: 400 });

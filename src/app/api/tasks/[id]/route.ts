@@ -29,13 +29,26 @@ export async function PATCH(request: Request, { params }: Context) {
     if (typeof body.title !== "string" || !body.title.trim()) {
       return NextResponse.json({ error: "Title cannot be empty" }, { status: 400 });
     }
+    if (body.title.trim().length > 200) {
+      return NextResponse.json(
+        { error: "Title must be 200 characters or fewer" },
+        { status: 400 }
+      );
+    }
     data.title = body.title.trim();
   }
   if (body.description !== undefined) {
     if (body.description !== null && typeof body.description !== "string") {
       return NextResponse.json({ error: "Invalid description" }, { status: 400 });
     }
-    data.description = body.description?.trim() || null;
+  const description = body.description?.trim() || null;
+    if (description && description.length > 500) {
+      return NextResponse.json(
+        { error: "Description must be 500 characters or fewer" },
+        { status: 400 }
+      );
+    }
+    data.description = description;
   }
   if (body.completed !== undefined) {
     if (typeof body.completed !== "boolean") {

@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { CircleAlert } from "lucide-react";
 import { api } from "@/lib/api";
+import { PRIORITY_STYLES } from "@/lib/priority";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import TaskMeta from "./TaskMeta";
 import TaskOptionsFields, { type TaskOptions } from "./TaskOptionsFields";
 import type { Task } from "./TaskList";
-import { PRIORITY_STYLES } from "@/lib/priority";
 
 function optionsOf(task: Task): TaskOptions {
   return {
@@ -24,6 +25,7 @@ export default function TaskItem({ task }: { task: Task }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [expanded, setExpanded] = useState(false);
   const [editing, setEditing] = useState(false);
   const [title, setTitle] = useState(task.title);
   const [options, setOptions] = useState<TaskOptions>(optionsOf(task));
@@ -45,10 +47,10 @@ export default function TaskItem({ task }: { task: Task }) {
   }
 
   function startEditing() {
-    // Reset the form to the task's current values every time editing starts
     setTitle(task.title);
     setOptions(optionsOf(task));
     setError("");
+    setExpanded(false);
     setEditing(true);
   }
 
@@ -75,6 +77,7 @@ export default function TaskItem({ task }: { task: Task }) {
             onChange={(e) => setTitle(e.target.value)}
             onKeyDown={(e) => e.key === "Escape" && cancel()}
             autoFocus
+            maxLength={200}
           />
           <TaskOptionsFields value={options} onChange={setOptions} />
           <div className="flex gap-2">
@@ -87,43 +90,65 @@ export default function TaskItem({ task }: { task: Task }) {
           </div>
         </form>
       ) : (
-        <div className="flex items-center gap-3">
-          <Checkbox
-            className="border-gray-400"
-            checked={task.completed}
-            disabled={busy}
-            onCheckedChange={(checked) =>
-              run("PATCH", { completed: checked === true })
-            }
-          />
-          <div className="flex-1">
-            <span
-              className={
-                task.completed ? "text-muted-foreground line-through" : ""
+        <>
+          <div className="flex items-center gap-3">
+            <Checkbox
+              className="border-gray-400"
+              checked={task.completed}
+              disabled={busy}
+              onCheckedChange={(checked) =>
+                run("PATCH", { completed: checked === true })
               }
+            />
+            <div className="flex-1">
+              <span
+                className={
+                  task.completed ? "text-muted-foreground line-through" : ""
+                }
+              >
+                {task.title}
+              </span>
+              <TaskMeta task={task} />
+            </div>
+            <Button
+              size="icon"
+              variant="ghost"
+              aria-label="Task details"
+              aria-expanded={expanded}
+              onClick={() => setExpanded(!expanded)}
             >
-              {task.title}
-            </span>
-            <TaskMeta task={task} />
+              <CircleAlert className="h-5 w-5 text-muted-foreground" />
+            </Button>
           </div>
-          <Button
-            size="sm"
-            variant="ghost"
-            disabled={busy}
-            onClick={startEditing}
-          >
-            Edit
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="text-destructive hover:text-destructive"
-            disabled={busy}
-            onClick={() => run("DELETE")}
-          >
-            Delete
-          </Button>
-        </div>
+
+          {expanded && (
+            <div className="mt-3 space-y-3 border-t pt-3 pl-7">
+              <p className="text-xs text-muted-foreground">
+                Priority: {PRIORITY_STYLES[task.priority].label}
+              </p>
+              <TaskMeta task={task} />
+              <div className="flex gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  disabled={busy}
+                  onClick={startEditing}
+                >
+                  Edit
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-destructive hover:text-destructive"
+                  disabled={busy}
+                  onClick={() => run("DELETE")}
+                >
+                  Delete
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
       )}
       {error && <p className="mt-1 text-sm text-destructive">{error}</p>}
     </li>
