@@ -1,11 +1,14 @@
 import { SignJWT, jwtVerify } from "jose";
 import { cookies } from "next/headers";
 
-if (!process.env.JWT_SECRET) {
-  throw new Error("JWT_SECRET is not set in .env");
+const rawSecret = process.env.JWT_SECRET;
+if (!rawSecret || rawSecret.length < 32) {
+  throw new Error(
+    "JWT_SECRET must be set in .env and be at least 32 characters",
+  );
 }
+const secret = new TextEncoder().encode(rawSecret);
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 const COOKIE_NAME = "session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days, in seconds
 
@@ -32,18 +35,11 @@ export async function getSession(): Promise<{ userId: number } | null> {
   if (!token) return null;
 
   try {
-    const { payload } = await jwtVerify(token, secret);
-    if (
-      typeof payload.userId !== "number" ||
-      !Number.isSafeInteger(payload.userId) ||
-      payload.userId < 1
-    ) {
-      return null;
-    }
-
+    const { payload } = await jwtVerify(token, secret, { algorithms: ["HS256"] });
+    if (typeof payload.userId !== "number") return null;
     return { userId: payload.userId };
   } catch {
-    return null; // expired, tampered with, or invalid
+    return null;
   }
 }
 

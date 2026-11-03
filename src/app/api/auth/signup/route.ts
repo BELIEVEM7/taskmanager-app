@@ -19,7 +19,7 @@ export async function POST(request: Request) {
       { status: 400 }
     );
   }
-  if (password.length < 8 || password.length > 72) {
+  if (password.length < 8 || Buffer.byteLength(password, "utf8") > 72) {
     return NextResponse.json(
       { error: "Password must be between 8 and 72 characters" },
       { status: 400 }

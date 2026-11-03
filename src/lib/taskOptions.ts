@@ -1,4 +1,4 @@
-  import type { Priority } from "@/generated/prisma/enums";
+import type { Priority } from "@/generated/prisma/enums";
 
 const PRIORITIES: Priority[] = ["NONE", "LOW", "MEDIUM", "HIGH"];
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
@@ -10,6 +10,16 @@ type Options = {
   priority?: Priority;
 };
 
+function isRealDate(value: string) {
+  const [y, m, d] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+  return (
+    date.getUTCFullYear() === y &&
+    date.getUTCMonth() === m - 1 &&
+    date.getUTCDate() === d
+  );
+}
+
 export function parseTaskOptions(
   body: Record<string, unknown>
 ): { data: Options } | { error: string } {
@@ -17,7 +27,8 @@ export function parseTaskOptions(
 
   if (body.startDate !== undefined) {
     if (!body.startDate) data.startDate = null; // empty or null clears it
-    else if (typeof body.startDate === "string" && DATE_RE.test(body.startDate))
+      else if ( typeof body.startDate === "string" && DATE_RE.test(body.startDate) && isRealDate(body.startDate)
+    )
       data.startDate = body.startDate;
     else return { error: "Start date must look like 2026-11-05" };
   }
