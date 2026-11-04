@@ -46,3 +46,24 @@ model Task{
 
   @@index([userId])
 }
+
+enum CodePurpose {
+  SIGNUP
+  RESET
+}
+
+model EmailCode {
+  id              Int         @id @default(autoincrement())
+  email           String
+  purpose         CodePurpose
+  codeHash        String
+  attempts        Int         @default(0)
+  expiresAt       DateTime
+  lastSentAt      DateTime    @default(now())
+  pendingName     String?
+  pendingPassword String?
+  createdAt       DateTime    @default(now())
+
+  @@unique([email, purpose])
+  @@index([expiresAt])
+}
