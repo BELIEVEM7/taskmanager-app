@@ -2,8 +2,17 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { createSession } from "@/lib/auth";
+import { rateLimit, clientIp } from "@/lib/rateLimit";
 
 export async function POST(request: Request) {
+  const limit = rateLimit(`signup:${clientIp(request)}`, 10, 60 * 60 * 1000);
+  if (!limit.ok) {
+    return NextResponse.json(
+    { error: "Too many sign-up attempts. Please try again later." },
+    { status: 429, headers: { "Retry-After": String(limit.retryAfter) } }
+      );
+  }
+  
   const body = await request.json().catch(() => null);
   const email =
     typeof body?.email === "string" ? body.email.trim().toLowerCase() : "";
