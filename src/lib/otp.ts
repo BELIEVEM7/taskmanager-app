@@ -1,6 +1,9 @@
 import { createHmac, randomInt, timingSafeEqual } from "crypto";
 import { prisma } from "@/lib/prisma";
-import { sendMail } from "@/lib/mail";
+
+// Sending lives in src/lib/email/. Re-exported here so the routes keep
+// importing sendCodeEmail from "@/lib/otp".
+export { sendOTP as sendCodeEmail } from "@/lib/email/send-otp";
 
 export type CodePurpose = "SIGNUP" | "RESET";
 
@@ -118,21 +121,4 @@ export async function checkCode(
   }
 
   return { ok: true as const, record };
-}
-
-export async function sendCodeEmail(
-  email: string,
-  code: string,
-  purpose: CodePurpose
-) {
-  const subject =
-    purpose === "SIGNUP" ? "Your verification code" : "Your password reset code";
-  const action =
-    purpose === "SIGNUP" ? "verify your email address" : "reset your password";
-
-  await sendMail({
-    to: email,
-    subject,
-    text: `Your code to ${action} is: ${code}\n\nIt expires in 10 minutes. If you didn't request this, you can ignore this email.`,
-  });
 }
