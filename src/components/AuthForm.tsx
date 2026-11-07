@@ -90,6 +90,7 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
     }
   }
 
+  // Step 2 of sign-up: enter the emailed code
   if (isSignup && pendingEmail) {
     return (
       <main className="mx-auto mt-20 max-w-sm px-4">
@@ -145,6 +146,7 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
     );
   }
 
+  // Login form, or step 1 of sign-up
   return (
     <main className="mx-auto mt-20 max-w-sm px-4">
       <Card>
@@ -171,9 +173,25 @@ export default function AuthForm({ mode }: { mode: "login" | "signup" }) {
                 required
               />
             )}
+
+            {!isSignup && (
+              <p className="text-right text-sm">
+                <Link
+                  href="/forgot-password"
+                  className="text-muted-foreground underline"
+                >
+                  Forgot password?
+                </Link>
+              </p>
+            )}
+
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Please wait..." : isSignup ? "Send verification code" : "Log in"}
+              {loading
+                ? "Please wait..."
+                : isSignup
+                  ? "Send verification code"
+                  : "Log in"}
             </Button>
           </form>
           <p className="mt-4 text-sm text-muted-foreground">
